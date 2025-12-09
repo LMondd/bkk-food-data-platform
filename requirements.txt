@@ -1,0 +1,6 @@
+apache-airflow-providers-google
+pandas
+faker
+psycopg2-binary
+# Remove "==6.4.0" so it doesn't fight with the constraints
+apache-airflow-providers-databricks

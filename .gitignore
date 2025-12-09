@@ -1,0 +1,23 @@
+# 1. Security
+dags/google_credentials.json
+google_credentials.json
+*.json
+secrets/
+.env
+
+# 2. Python & Virtual Envs
+venv/
+__pycache__/
+*.pyc
+
+# 3. Docker & Logs
+logs/
+plugins/
+docker-context-files/
+
+# 4. Data (Don't upload massive CSVs)
+dags/*.csv
+scripts/*.csv
+
+# 5. OS Junk
+.DS_Store
