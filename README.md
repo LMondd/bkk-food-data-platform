@@ -87,15 +87,16 @@ The pipeline consists of three main phases orchestrated by **Apache Airflow**:
 
 ### 1. Airflow DAGs
 *Automated pipeline running successfully.*
-![Airflow DAG](images/airflow_green_dag.png) *(Replace with your screenshot)*
+![Airflow DAG](images/airflow_dag_1.png)
+![Airflow DAG](images/airflow_dag_2.png)
 
 ### 2. BigQuery Warehouse
 *Data loaded successfully into Google Cloud for analysis.*
-![BigQuery Results](images/bigquery_preview.png) *(Replace with your screenshot)*
+![BigQuery Results](images/bigquery_data.png)
 
 ### 3. Databricks Delta Lake
 *Spark processing verification.*
-![Databricks Notebook](images/databricks_success.png) *(Replace with your screenshot)*
+![Databricks Notebook](images/databricks_run.png)
 
 ---
 
