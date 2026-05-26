@@ -7,9 +7,9 @@
 ![Spark](https://img.shields.io/badge/Processing-Databricks%20%2F%20Spark-FF3621?style=for-the-badge&logo=apachespark)
 
 ## 📋 Project Overview
-This project simulates a **Food Delivery Data Platform** for the Bangkok metropolitan area. It generates realistic mock delivery orders (using Thai localization) and processes them through a modern hybrid-cloud data pipeline.
+This project simulates a **Food Delivery Data Platform** for the Bangkok metropolitan area. It generates realistic mock delivery orders (Thai-localized) and processes them through a modern hybrid-cloud ELT pipeline — landing raw data in a cloud data lake, then fanning out to both a **data-warehouse path** (BigQuery) and a **lakehouse path** (Databricks/Delta) from a single Airflow control plane.
 
-The goal was to build a robust ELT pipeline that mimics real-world scenarios demonstrating proficiency in **Data Lakehouse architecture**, **Cloud Engineering**, and **Distributed Processing**.
+The goal: a robust, replayable ELT pipeline that exercises real-world concerns — dirty-data handling, UTF-8 integrity for Thai text, and cross-cloud orchestration — rather than a clean toy dataset.
 
 ---
 
@@ -83,6 +83,16 @@ The pipeline consists of three main phases orchestrated by **Apache Airflow**:
 
 ---
 
+## 🧭 Design Decisions
+
+* **Why both BigQuery *and* Databricks?** Deliberate — the two serve different consumers. **BigQuery** is the warehouse path: serverless, SQL-first, for fast ad-hoc business analytics. **Databricks + Delta** is the lakehouse path: PySpark transformation with schema-enforced, ML-ready Delta tables. The project intentionally demonstrates both the **data-warehouse** and **lakehouse** patterns rather than committing to one paradigm.
+* **Airflow as a single cross-cloud control plane.** One DAG orchestrates local generation → GCS → BigQuery → Databricks, so cross-cloud complexity is centralized and observable instead of scattered across per-cloud schedulers.
+* **GCS as a landing zone before load.** Decouples ingestion from consumption — raw CSVs are durably staged, so the BigQuery load and the Databricks read are independently replayable.
+* **ELT, not ETL.** Land raw first, transform downstream (in-warehouse and in-Spark), keeping the raw layer immutable and reprocessable.
+* **Dirty data injected on purpose.** Negative values and nulls are generated deliberately to exercise the cleansing and quality-check logic, mirroring real upstream messiness.
+
+---
+
 ## 📸 Pipeline Visuals
 
 ### 1. Airflow DAGs
@@ -110,7 +120,7 @@ The pipeline consists of three main phases orchestrated by **Apache Airflow**:
 ### Steps
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/bkk-food-data-platform.git](https://github.com/YOUR_USERNAME/bkk-food-data-platform.git)
+    git clone https://github.com/LMondd/bkk-food-data-platform.git
     cd bkk-food-data-platform
     ```
 
@@ -124,12 +134,12 @@ The pipeline consists of three main phases orchestrated by **Apache Airflow**:
     ```
 
 4.  **Access UI**
-    * Go to `http://localhost:8080` (User/Pass: `admin`/`admin`).
+    * Go to `http://localhost:8080` (User/Pass: `admin`/`admin` — local default).
     * Trigger the DAGs!
 
 ---
 
-## 🧠 What I Learned
-* **Cross-Cloud Networking:** Solving connectivity issues between local Docker containers, GCS, and Azure Databricks APIs.
-* **Docker Optimization:** fixing build times on Apple Silicon by pinning specific Python constraints.
-* **Data Quality:** The importance of enforcing `UTF-8` encoding when dealing with non-English languages (Thai) in data pipelines.
+## 🧠 Engineering Challenges Solved
+* **Cross-Cloud Networking:** Resolved connectivity between local Docker containers, GCS, and the Azure Databricks API — authentication, file push via DBFS, and cluster targeting.
+* **Reproducible Builds:** Fixed Docker build times on Apple Silicon by pinning specific Python constraints.
+* **Encoding Integrity:** Enforced `UTF-8` end-to-end so Thai-language fields survive generation → GCS → BigQuery/Delta without corruption.
